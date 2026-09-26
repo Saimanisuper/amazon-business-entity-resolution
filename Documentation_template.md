@@ -1,4 +1,4 @@
-# ML Challenge 2026: Business Entity Resolution Solution Template
+# Amazon ML Challenge 2026: Business Entity Resolution Solution Template
 
 **Team Name:** Mighty  
 **Team Members:** Mani, Harsha  
