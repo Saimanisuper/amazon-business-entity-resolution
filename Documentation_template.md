@@ -1,7 +1,7 @@
 # ML Challenge 2026: Business Entity Resolution Solution Template
 
 **Team Name:** Mighty  
-**Team Members:** [Your Team Members]  
+**Team Members:** Mani, Harsha  
 **Submission Date:** September 2026  
 
 ---
