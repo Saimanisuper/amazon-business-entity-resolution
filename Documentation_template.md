@@ -1,6 +1,6 @@
 # ML Challenge 2026: Business Entity Resolution Solution Template
 
-**Team Name:** EntityResolution-Masters  
+**Team Name:** Mighty  
 **Team Members:** [Your Team Members]  
 **Submission Date:** September 2026  
 
