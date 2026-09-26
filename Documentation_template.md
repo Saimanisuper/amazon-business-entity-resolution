@@ -22,7 +22,7 @@ During exploratory data analysis (EDA) of the multi-million record sources ($S_1
 
 ### 2.2 Solution Strategy
 **Approach Type:** Multi-Index Inverted Blocking + Pairwise Gradient Boosted Classifier + Precision-Biased Threshold Tuning  
-**Core Innovation:** A two-stage pipeline combining frequency-capped token blocking with a calibrated decision boundary tuned on the official macro $F_{0.5}$ loss function, enforcing the subset containment constraint $\text{matched\_entity\_ids} \subseteq \text{candidate\_entity\_ids}$.
+**Core Innovation:** A two-stage pipeline combining frequency-capped token blocking with a calibrated decision boundary tuned on the official macro $F_{0.5}$ loss function, enforcing the subset containment constraint .
 
 ---
 
