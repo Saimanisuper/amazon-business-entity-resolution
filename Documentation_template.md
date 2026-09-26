@@ -2,7 +2,7 @@
 
 **Team Name:** Mighty  
 **Team Members:** Mani, Harsha  
-**Submission Date:** September 2026  
+**Submission Date:** 27th September 2026  
 
 ---
 
