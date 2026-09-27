@@ -42,9 +42,9 @@ if not TEST_SOURCE1.exists() and (RESOURCES_DIR / "test1.txt").exists():
     TEST_SOURCE3 = RESOURCES_DIR / "test3.txt"
 
 # Model and Pipeline hyperparameters
-BLOCKING_TOP_K = 15          # Max candidates generated per S1 entity
+BLOCKING_TOP_K = 3           # Focused top candidates per S1 entity for compact file size and high precision
 MAX_TRAIN_PAIRS = 500000     # Manageable pair count for training
 VAL_SAMPLE_SIZE = 50000      # Validation sample size for threshold tuning
 BETA = 0.5                   # F_beta weight
-DEFAULT_THRESHOLD = 0.75     # Default probability threshold favoring precision
+DEFAULT_THRESHOLD = 0.85     # Precision-heavy threshold to eliminate false merges and keep file small
 NUM_WORKERS = max(1, os.cpu_count() - 1 if os.cpu_count() else 4)

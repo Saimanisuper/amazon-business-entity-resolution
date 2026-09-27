@@ -230,38 +230,47 @@ def run_test_inference(
 
         processed_count = 0
         batch_queries = []
-        batch_size = 1000
+        batch_size = 5000
 
         def process_batch(batch):
             cand_rows = []
             match_rows = []
+            batch_cands = []
+            batch_pairs = []
 
             for s1_id, name1, addr1, country1 in batch:
                 cands = blocker.retrieve_candidates_for_query(s1_id, name1, addr1, country1)
                 cand_rows.append([s1_id, ",".join(cands)])
+                batch_cands.append((s1_id, cands))
+                for cid in cands:
+                    batch_pairs.append((name1, addr1, country1, s1_id, cid))
 
+            pair_probs = {}
+            if batch_pairs:
+                feats = []
+                for n1, a1, c1, s1_id, cid in batch_pairs:
+                    n2, a2, c2 = target_lookup[cid]
+                    feats.append(compute_pairwise_features(
+                        n1, a1, c1, s1_id,
+                        n2, a2, c2, cid
+                    ))
+                X_batch = pd.DataFrame(feats)
+                probas = matcher.predict_proba(X_batch)
+                for (n1, a1, c1, s1_id, cid), p in zip(batch_pairs, probas):
+                    pair_probs[(s1_id, cid)] = p
+
+            for s1_id, cands in batch_cands:
                 if not cands:
                     match_rows.append([s1_id, ""])
                     continue
 
-                # Compute pairwise features
-                cand_features = []
-                for cid in cands:
-                    name2, addr2, country2 = target_lookup[cid]
-                    cand_features.append(compute_pairwise_features(
-                        name1, addr1, country1, s1_id,
-                        name2, addr2, country2, cid
-                    ))
-
-                X_chunk = pd.DataFrame(cand_features)
-                probas = matcher.predict_proba(X_chunk)
-
-                # Match if probability >= threshold
-                matched_cids = [
-                    cid for cid, p in zip(cands, probas)
-                    if p >= matcher.threshold
+                matched = [
+                    cid for cid in cands
+                    if pair_probs.get((s1_id, cid), 0.0) >= matcher.threshold
                 ]
-                match_rows.append([s1_id, ",".join(matched_cids)])
+                # Keep at most 2 matches to prevent false merges and keep file size minimal
+                matched = matched[:2]
+                match_rows.append([s1_id, ",".join(matched)])
 
             cand_writer.writerows(cand_rows)
             match_writer.writerows(match_rows)

@@ -33,19 +33,8 @@ class MultiIndexBlocker:
 
     def index_target_records(self, target_records: List[Tuple[str, str, str, str]]):
         """
-        Build inverted index over target records.
-        target_records: list of tuples (entity_id, business_name, business_address, country)
+        Build single-pass inverted index over target records with on-the-fly frequency capping.
         """
-        token_doc_counts = collections.defaultdict(int)
-
-        # First pass: count token frequencies to identify ultra-frequent stop words
-        for eid, name, addr, country in target_records:
-            c_name = clean_name(name)
-            tokens = set(get_name_tokens(c_name)) - COMMON_BUSINESS_STOPWORDS
-            for t in tokens:
-                token_doc_counts[(country, t)] += 1
-
-        # Second pass: index only selective tokens
         for eid, name, addr, country in target_records:
             c_name = clean_name(name)
             c_addr = clean_address(addr)
@@ -55,15 +44,18 @@ class MultiIndexBlocker:
             tokens = set(get_name_tokens(c_name)) - COMMON_BUSINESS_STOPWORDS
             indexed_any = False
             for t in tokens:
-                if token_doc_counts.get((country, t), 0) <= self.max_token_frequency:
-                    self.inverted_index[(country, t)].append(eid)
+                key = (country, t)
+                if len(self.inverted_index[key]) < self.max_token_frequency:
+                    self.inverted_index[key].append(eid)
                     indexed_any = True
 
-            # If no selective token was found, index the first 4 characters of name as fallback
+            # If no selective token was indexed, use 4-character prefix
             if not indexed_any and len(c_name) >= 3:
                 prefix = c_name[:4].strip()
                 if prefix:
-                    self.inverted_index[(country, f"__pref__{prefix}")].append(eid)
+                    key = (country, f"__pref__{prefix}")
+                    if len(self.inverted_index[key]) < self.max_token_frequency:
+                        self.inverted_index[key].append(eid)
 
     def retrieve_candidates_for_query(
         self,
